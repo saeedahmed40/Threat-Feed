@@ -1,0 +1,178 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+  <meta charset="UTF-8">
+  <meta name="viewport" content="width=device-width, initial-scale=1.0">
+  <title>The Threat Feed</title>
+  <style>
+    body {
+      font-family: Arial, sans-serif;
+      margin: 0;
+      padding: 0;
+      line-height: 1.6;
+      color: #333;
+    }
+
+    header {
+      background-color: #333;
+      color: white;
+      padding: 10px 0;
+      text-align: center;
+    }
+
+    nav {
+      background-color: #444;
+    }
+
+    nav ul {
+      list-style: none;
+      margin: 0;
+      padding: 0;
+      display: flex;
+      justify-content: center;
+    }
+
+    nav ul li {
+      margin: 0;
+    }
+
+    nav ul li a {
+      display: block;
+      color: white;
+      padding: 15px 20px;
+      text-decoration: none;
+      transition: background-color 0.3s;
+    }
+
+    nav ul li a:hover {
+      background-color: #555;
+    }
+
+    .hero {
+      height: 400px;
+      background: url('https://www.visitwales.com/sites/visit/files/styles/o_herostandard_fullwidth_xl_min_1x/public/media-library/2019-10/Transporter%20Bridge%20gondola-small.jpg?h=375e8eb3&itok=9IWYyu0D') no-repeat center center;
+      background-size: cover;
+      display: flex;
+      justify-content: center;
+      align-items: center;
+      color: white;
+      outline: 13px solid #0d0d0d;
+      outline-offset: 5px;
+      text-align: center;
+    }
+
+    .hero h2 {
+      font-size: 3em;
+      margin: 0;
+    }
+
+    main {
+      max-width: 800px;
+      margin: 0 auto;
+      padding: 20px;
+    }
+
+
+
+    footer {
+      text-align: center;
+      background-color: #333;
+      color: white;
+      padding: 10px 0;
+      position: fixed;
+      width: 100%;
+      bottom: 0;
+    }
+  </style>
+</head>
+<body>
+  <header>
+    <h1>The Threat Feed</h1>
+    <nav>
+      <ul>
+        <li><a href="https://www.newport.gov.uk/">Newport Council</a></li>
+        <li><a href="about.html">About</a></li>
+        <li><a href="contact.html">Contact</a></li>
+      </ul>
+    </nav>
+  </header>
+
+  <section class="hero">
+    <h2>Stay Informed</h2>
+  </section>
+
+  <main>
+    <h2>Welcome to The Threat Feed</h2>
+    <p>Stay up to date with the latest threats and vulnerabilities in the cyber security world.</p>
+    <p>Learn how to protect yourself and your business from the latest threats.</p>
+    <div class="CyberWire-Daily">
+      <iframe style="border-radius:12px" src="https://open.spotify.com/embed/show/0CnYnxrAcfRjh0YSQINAwe?utm_source=generator&theme=0" width="100%" height="152" frameBorder="0" allowfullscreen="" allow="autoplay; clipboard-write; encrypted-media; fullscreen; picture-in-picture" loading="lazy"></iframe>
+    </div>
+    <div class="Darknet-Diarises">
+      <iframe style="border-radius:12px" src="https://open.spotify.com/embed/show/4XPl3uEEL9hvqMkoZrzbx5?utm_source=generator&theme=0&t=0" width="100%" height="152" frameBorder="0" allowfullscreen="" allow="autoplay; clipboard-write; encrypted-media; fullscreen; picture-in-picture" loading="lazy"></iframe>
+    </div>
+    <div class="darkreading-feed">
+      <h2>Latest from Dark Reading Cyber Risk</h2>
+      <ul id="darkreading-feed-content"></ul>
+    </div>    
+
+  </main>
+
+  <footer>
+    <p>&copy; 2024 The Threat Feed</p>
+  </footer>
+  <script
+    const podcastListContent = document.getElementById('podcast-list-content');
+    const rssFeedContent = document.getElementById('rss-feed-content');
+    const darkReadingFeedContent = document.getElementById('darkreading-feed-content');
+    const rssUrl = 'https://feeds.megaphone.fm/cyberwire-daily-podcast';
+
+    fetch(rssUrl)
+      .then(response => response.text())
+      .then(data => {
+        const parser = new DOMParser();
+        const xmlDoc = parser.parseFromString(data, 'text/xml');
+        const items = xmlDoc.querySelectorAll('item');
+
+        items.forEach(item => {
+          const title = item.querySelector('title').textContent;
+          const link = item.querySelector('link').textContent;
+
+          const podcastItem = document.createElement('a');
+          podcastItem.href = link;
+          podcastItem.textContent = title;
+          podcastListContent.appendChild(podcastItem);
+
+          const rssFeedItem = document.createElement('li');
+          const rssFeedLink = document.createElement('a');
+          rssFeedLink.href = link;
+          rssFeedLink.textContent = title;
+          rssFeedItem.appendChild(rssFeedLink);
+          rssFeedContent.appendChild(rssFeedItem);
+        });
+      })
+      .catch(error => console.error('Error fetching RSS feed:', error));
+
+    // JavaScript code to fetch and parse the Dark Reading Cyber Risk page
+    axios.get('https://www.darkreading.com/cyber-risk')
+      .then(response => {
+        const html = response.data;
+        const $ = cheerio.load(html);
+        const articles = $('.listingResult');
+
+        articles.each((index, element) => {
+          const title = $(element).find('.article-heading').text().trim();
+          const link = $(element).find('a').attr('href');
+
+          const darkReadingFeedItem = document.createElement('li');
+          const darkReadingFeedLink = document.createElement('a');
+          darkReadingFeedLink.href = link;
+          darkReadingFeedLink.textContent = title;
+          darkReadingFeedItem.appendChild(darkReadingFeedLink);
+          darkReadingFeedContent.appendChild(darkReadingFeedItem);
+        });
+      })
+      .catch(error => console.error('Error fetching Dark Reading Cyber Risk page:', error));
+  </script>
+</body>
+</html>
