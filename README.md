@@ -10,7 +10,7 @@ This project seeks to enhance digital literacy and cybersecurity awareness among
  - Provide education on digital literacy that goes in hand with cybersecurity awareness
 
 # How It Works
-This project leverages a user-friendly HTML web interface to deliver timely cybersecurity information and threat intelligence directly to the public. The platform aggregates and processes RSS feeds from reputable cybersecurity sources to provide:
+This project leverages a user-friendly HTML and Python web app interface to deliver timely cybersecurity information and threat intelligence directly to the public. The platform aggregates and processes RSS feeds from reputable cybersecurity sources to provide:
 
   - Real-time updates on the latest threats, vulnerabilities, and security incidents.
   - Curated content presented in a clear and concise format.
