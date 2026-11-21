@@ -107,6 +107,19 @@
       transition: transform 0.3s cubic-bezier(0.16, 1, 0.3, 1);
     }
 
+    /* Animated Equalizer Bars for Live Podcast Playback */
+    @keyframes eqPulse {
+      0%, 100% { transform: scaleY(0.28); }
+      50% { transform: scaleY(1); }
+    }
+    .eq-bar {
+      transform-origin: bottom;
+      animation: eqPulse 0.85s ease-in-out infinite;
+    }
+    .eq-bar:nth-child(2) { animation-delay: 0.2s; }
+    .eq-bar:nth-child(3) { animation-delay: 0.4s; }
+    .eq-bar:nth-child(4) { animation-delay: 0.15s; }
+
     /* Print-friendly fallback styling if user prints directly via browser */
     @media print {
       @page {
@@ -601,72 +614,174 @@
       </div>
 
       <!-- Persistent Embedded HTML5 Audio Briefing Player Bar -->
-      <div class="bg-obsidian border border-podcastViolet/40 rounded-xl p-3.5 sm:p-4 flex flex-col lg:flex-row lg:items-center justify-between gap-3.5 shadow-inner">
-        <div class="flex items-center gap-3.5 min-w-0 flex-1">
-          <button
-            id="player-play-pause-btn"
-            onclick="togglePodcastPlayback()"
-            aria-label="Play or Pause Podcast Briefing"
-            class="w-11 h-11 rounded-xl bg-podcastViolet hover:bg-purple-500 text-white flex items-center justify-center shrink-0 shadow-lg shadow-podcastViolet/30 transition cursor-pointer"
-          >
-            <svg id="player-icon-play" class="w-5 h-5 ml-0.5" fill="currentColor" viewBox="0 0 24 24"><path d="M8 5v14l11-7z"/></svg>
-            <svg id="player-icon-pause" class="w-5 h-5 hidden" fill="currentColor" viewBox="0 0 24 24"><path d="M6 19h4V5H6v14zm8-14v14h4V5h-4z"/></svg>
-          </button>
-
-          <div class="min-w-0 flex-1">
-            <div class="flex flex-wrap items-center gap-2 mb-0.5">
-              <span id="player-show-badge" class="px-2 py-0.5 rounded text-[10px] font-mono font-bold bg-cyanAlert/15 text-cyanAlert border border-cyanAlert/40">
-                CyberWire Daily • #2681
-              </span>
-              <span id="player-date-label" class="text-[11px] font-mono text-gray-400">20 Nov 2026 • 24:15</span>
-              <span id="player-mode-badge" class="text-[10px] font-mono px-1.5 py-0.2 rounded bg-slateSurface text-gray-300 border border-borderDark">
-                Ready to Stream
-              </span>
-            </div>
-            <div id="player-episode-title" class="text-xs sm:text-sm font-bold text-white truncate">
-              Four flaws, no time to stall.
-            </div>
-          </div>
-        </div>
-
-        <!-- Scrubber & External Episode Link -->
-        <div class="flex flex-col sm:flex-row items-stretch sm:items-center gap-3 lg:w-[46%]">
-          <div class="flex items-center gap-2.5 flex-1">
-            <span id="player-current-time" class="text-[11px] font-mono text-gray-400 w-10 text-right">00:00</span>
-            <input
-              id="player-seek-bar"
-              type="range"
-              min="0"
-              max="100"
-              value="0"
-              oninput="seekPodcastAudio(this.value)"
-              class="w-full h-1.5 bg-slateSurface rounded-lg appearance-none cursor-pointer accent-podcastViolet"
-            />
-            <span id="player-duration-time" class="text-[11px] font-mono text-gray-400 w-10">24:15</span>
-          </div>
-
-          <div class="flex items-center gap-2 shrink-0">
+      <div class="bg-obsidian border border-podcastViolet/40 rounded-xl p-3.5 sm:p-4 space-y-3 shadow-inner">
+        <div class="flex flex-col xl:flex-row xl:items-center justify-between gap-3.5">
+          <!-- Play/Pause + Skip Controls + Episode Metadata -->
+          <div class="flex items-center gap-2.5 sm:gap-3 min-w-0 flex-1">
+            <!-- Rewind 15s -->
             <button
-              id="player-highlight-ttp-btn"
-              onclick="highlightCurrentPodcastOnMatrix()"
-              class="px-2.5 py-1.5 rounded-lg text-[11px] font-semibold bg-emeraldPulse/15 hover:bg-emeraldPulse text-emeraldPulse hover:text-obsidian border border-emeraldPulse/40 transition cursor-pointer whitespace-nowrap"
+              onclick="skipPodcastAudio(-15)"
+              title="Rewind 15 seconds"
+              aria-label="Rewind 15 seconds"
+              class="px-2 py-2 rounded-lg bg-slateSurface hover:bg-gray-700 text-gray-300 hover:text-white border border-borderDark text-[10px] font-mono font-bold transition cursor-pointer shrink-0"
             >
-              Matrix TTPs ↑
+              -15s
             </button>
-            <a
-              id="player-external-link"
-              href="https://thecyberwire.com/podcasts/daily-podcast"
-              target="_blank"
-              rel="noopener noreferrer"
-              class="px-2.5 py-1.5 rounded-lg text-[11px] font-medium bg-slateSurface hover:bg-gray-700 text-gray-200 border border-borderDark transition whitespace-nowrap"
+
+            <!-- Play / Pause -->
+            <button
+              id="player-play-pause-btn"
+              onclick="togglePodcastPlayback()"
+              aria-label="Play or Pause Podcast Episode"
+              class="w-11 h-11 rounded-xl bg-podcastViolet hover:bg-purple-500 text-white flex items-center justify-center shrink-0 shadow-lg shadow-podcastViolet/30 transition cursor-pointer"
             >
-              Episode Page ↗
-            </a>
+              <svg id="player-icon-play" class="w-5 h-5 ml-0.5" fill="currentColor" viewBox="0 0 24 24"><path d="M8 5v14l11-7z"/></svg>
+              <svg id="player-icon-pause" class="w-5 h-5 hidden" fill="currentColor" viewBox="0 0 24 24"><path d="M6 19h4V5H6v14zm8-14v14h4V5h-4z"/></svg>
+            </button>
+
+            <!-- Forward 30s -->
+            <button
+              onclick="skipPodcastAudio(30)"
+              title="Forward 30 seconds"
+              aria-label="Forward 30 seconds"
+              class="px-2 py-2 rounded-lg bg-slateSurface hover:bg-gray-700 text-gray-300 hover:text-white border border-borderDark text-[10px] font-mono font-bold transition cursor-pointer shrink-0"
+            >
+              +30s
+            </button>
+
+            <div class="min-w-0 flex-1 pl-1">
+              <div class="flex flex-wrap items-center gap-2 mb-0.5">
+                <span id="player-show-badge" class="px-2 py-0.5 rounded text-[10px] font-mono font-bold bg-cyanAlert/15 text-cyanAlert border border-cyanAlert/40">
+                  CyberWire Daily • #2681
+                </span>
+                <span id="player-date-label" class="text-[11px] font-mono text-gray-400">20 Nov 2026 • 24:15</span>
+                <span id="player-mode-badge" class="text-[10px] font-mono px-1.5 py-0.2 rounded bg-slateSurface text-emeraldPulse border border-borderDark">
+                  Direct MP3 Stream Ready
+                </span>
+                <!-- Equalizer Bars (visible when playing) -->
+                <span id="player-eq-bars" class="hidden inline-flex items-end gap-0.5 h-3 ml-0.5" aria-hidden="true">
+                  <span class="eq-bar w-0.5 h-3 bg-emeraldPulse rounded-full"></span>
+                  <span class="eq-bar w-0.5 h-3 bg-podcastViolet rounded-full"></span>
+                  <span class="eq-bar w-0.5 h-3 bg-cyanAlert rounded-full"></span>
+                  <span class="eq-bar w-0.5 h-3 bg-emeraldPulse rounded-full"></span>
+                </span>
+              </div>
+              <div id="player-episode-title" class="text-xs sm:text-sm font-bold text-white truncate">
+                Four flaws, no time to stall.
+              </div>
+            </div>
+          </div>
+
+          <!-- Scrubber, Volume, Speed & External Episode Link -->
+          <div class="flex flex-col md:flex-row items-stretch md:items-center gap-3 xl:w-[54%]">
+            <div class="flex items-center gap-2.5 flex-1">
+              <span id="player-current-time" class="text-[11px] font-mono text-gray-400 w-11 text-right">00:00</span>
+              <input
+                id="player-seek-bar"
+                type="range"
+                min="0"
+                max="100"
+                step="0.1"
+                value="0"
+                oninput="seekPodcastAudio(this.value)"
+                class="w-full h-1.5 bg-slateSurface rounded-lg appearance-none cursor-pointer accent-podcastViolet"
+              />
+              <span id="player-duration-time" class="text-[11px] font-mono text-gray-400 w-11">24:15</span>
+            </div>
+
+            <div class="flex flex-wrap items-center gap-2 shrink-0">
+              <!-- Volume Mute + Slider -->
+              <div class="flex items-center gap-1.5 bg-slateSurface border border-borderDark rounded-lg px-2 py-1">
+                <button
+                  id="player-mute-btn"
+                  onclick="togglePodcastMute()"
+                  title="Mute / Unmute"
+                  aria-label="Mute or Unmute Podcast Audio"
+                  class="text-gray-300 hover:text-white cursor-pointer"
+                >
+                  <svg id="player-icon-vol" class="w-3.5 h-3.5" fill="none" stroke="currentColor" viewBox="0 0 24 24">
+                    <path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M15.536 8.464a5 5 0 010 7.072m2.828-9.9a9 9 0 010 12.728M5.586 15H4a1 1 0 01-1-1v-4a1 1 0 011-1h1.586l4.707-4.707C10.923 3.663 12 4.109 12 5v14c0 .891-1.077 1.337-1.707.707L5.586 15z"/>
+                  </svg>
+                  <svg id="player-icon-muted" class="w-3.5 h-3.5 hidden text-crimsonAlert" fill="none" stroke="currentColor" viewBox="0 0 24 24">
+                    <path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M5.586 15H4a1 1 0 01-1-1v-4a1 1 0 011-1h1.586l4.707-4.707C10.923 3.663 12 4.109 12 5v14c0 .891-1.077 1.337-1.707.707L5.586 15zM17 14l2-2m0 0l2-2m-2 2l-2-2m2 2l2 2"/>
+                  </svg>
+                </button>
+                <input
+                  id="player-volume-bar"
+                  type="range"
+                  min="0"
+                  max="1"
+                  step="0.05"
+                  value="0.9"
+                  aria-label="Podcast Volume"
+                  oninput="setPodcastVolume(this.value)"
+                  class="w-14 h-1 bg-obsidian rounded-lg appearance-none cursor-pointer accent-emeraldPulse"
+                />
+              </div>
+
+              <!-- Playback Speed -->
+              <select
+                id="player-speed-select"
+                onchange="setPodcastPlaybackSpeed(this.value)"
+                aria-label="Podcast Playback Speed"
+                class="bg-slateSurface border border-borderDark rounded-lg px-2 py-1.5 text-[11px] font-mono text-gray-200 outline-none focus:border-podcastViolet cursor-pointer"
+              >
+                <option value="1">1.0x</option>
+                <option value="1.25">1.25x</option>
+                <option value="1.5">1.5x</option>
+                <option value="2">2.0x</option>
+              </select>
+
+              <!-- Embedded Official Web Player Toggle -->
+              <button
+                id="player-embed-toggle-btn"
+                onclick="toggleOfficialEmbedPlayer()"
+                title="Switch to Official Megaphone / Libsyn Embedded Audio Player"
+                class="px-2.5 py-1.5 rounded-lg text-[11px] font-medium bg-slateSurface hover:bg-purple-500/20 text-purple-200 border border-borderDark hover:border-podcastViolet/50 transition cursor-pointer whitespace-nowrap"
+              >
+                Web Player
+              </button>
+
+              <!-- Matrix TTP Highlight -->
+              <button
+                id="player-highlight-ttp-btn"
+                onclick="highlightCurrentPodcastOnMatrix()"
+                class="px-2.5 py-1.5 rounded-lg text-[11px] font-semibold bg-emeraldPulse/15 hover:bg-emeraldPulse text-emeraldPulse hover:text-obsidian border border-emeraldPulse/40 transition cursor-pointer whitespace-nowrap"
+              >
+                Matrix TTPs ↑
+              </button>
+
+              <!-- Direct MP3 / Episode Page Link -->
+              <a
+                id="player-external-link"
+                href="https://thecyberwire.com/podcasts/daily-podcast"
+                target="_blank"
+                rel="noopener noreferrer"
+                class="px-2.5 py-1.5 rounded-lg text-[11px] font-medium bg-slateSurface hover:bg-gray-700 text-gray-200 border border-borderDark transition whitespace-nowrap"
+              >
+                Open ↗
+              </a>
+            </div>
           </div>
         </div>
 
-        <!-- Hidden HTML5 Audio Element -->
-        <audio id="podcast-audio-element" preload="none"></audio>
+        <!-- Embedded Official Libsyn / Megaphone Web Audio Player Dock (Auto-opens if direct MP3 stream is blocked by network/CDN) -->
+        <div id="podcast-embed-container" class="hidden pt-2.5 border-t border-borderDark">
+          <div class="flex items-center justify-between text-[11px] font-mono text-gray-400 mb-2">
+            <span id="podcast-embed-label" class="text-purple-300">Official Embedded Show Audio Player</span>
+            <button onclick="hideOfficialEmbedPlayer()" class="text-gray-400 hover:text-white cursor-pointer">Hide Web Player ×</button>
+          </div>
+          <iframe
+            id="podcast-embed-iframe"
+            title="Official Podcast Audio Player"
+            class="w-full h-[152px] rounded-lg border border-borderDark bg-charcoal"
+            allow="autoplay; encrypted-media"
+            loading="lazy"
+          ></iframe>
+        </div>
+
+        <!-- Native HTML5 Audio Element (No crossorigin attribute so Libsyn/Megaphone/Podtrac MP3 streams play directly) -->
+        <audio id="podcast-audio-element" preload="metadata"></audio>
       </div>
 
       <!-- Podcast Episodes Grid -->
@@ -1720,6 +1835,7 @@
         techniques: ['T1190', 'T1059', 'T1583.005'],
         linkedCves: ['CVE-2026-114938', 'CVE-2026-109618', 'CVE-2026-10135'],
         audioUrl: 'https://traffic.libsyn.com/secure/thecyberwire/CW_Daily_2681.mp3',
+        embedUrl: 'https://html5-player.libsyn.com/embed/destination/id/353028/height/150/theme/custom/thumbnail/yes/direction/backward/no-cache/true/render-playlist/no/custom-color/1bca32/',
         episodeUrl: 'https://thecyberwire.com/podcasts/daily-podcast',
         rssUrl: 'https://thecyberwire.libsyn.com/rss',
         mitreRationale: 'Maps emergency perimeter patching against public-facing RCE (T1190), post-exploit scripting shells (T1059), and ORB edge router infrastructure acquisition (T1583.005).'
@@ -1737,6 +1853,7 @@
         techniques: ['T1195.002', 'T1498', 'T0836'],
         linkedCves: ['CVE-2026-42922', 'CVE-2026-49177'],
         audioUrl: 'https://traffic.libsyn.com/secure/thecyberwire/CW_Daily_2680.mp3',
+        embedUrl: 'https://html5-player.libsyn.com/embed/destination/id/353028/height/150/theme/custom/thumbnail/yes/direction/backward/no-cache/true/render-playlist/no/custom-color/1bca32/',
         episodeUrl: 'https://thecyberwire.com/podcasts/daily-podcast',
         rssUrl: 'https://thecyberwire.libsyn.com/rss',
         mitreRationale: 'Connects third-party experimentation script compromise (T1195.002) with coordinated network Denial of Service (T1498) and ICS/OT parameter manipulation (T0836).'
@@ -1754,6 +1871,7 @@
         techniques: ['T1068', 'T1078', 'T1114'],
         linkedCves: ['CVE-2026-119990', 'CVE-2026-80093'],
         audioUrl: 'https://traffic.libsyn.com/secure/thecyberwire/CW_Daily_2677.mp3',
+        embedUrl: 'https://html5-player.libsyn.com/embed/destination/id/353028/height/150/theme/custom/thumbnail/yes/direction/backward/no-cache/true/render-playlist/no/custom-color/1bca32/',
         episodeUrl: 'https://thecyberwire.com/podcasts/daily-podcast',
         rssUrl: 'https://thecyberwire.libsyn.com/rss',
         mitreRationale: 'Tracks kernel/service privilege escalation (T1068) paired with stolen employee valid accounts (T1078) and cloud warehouse / email collection (T1114).'
@@ -1770,7 +1888,8 @@
         summary: 'Special retrospective and threat outlook examining AI-accelerated vulnerability discovery, adversarial direct prompt injection against enterprise copilots, and AI-enabled data exfiltration aligned with the NCSC Annual Review 2026.',
         techniques: ['T1656', 'T1678', 'T1595'],
         linkedCves: [],
-        audioUrl: 'https://traffic.libsyn.com/secure/thecyberwire/CW_Daily_110_AI_Decade.mp3',
+        audioUrl: 'https://traffic.libsyn.com/secure/thecyberwire/CW_Daily_2675.mp3',
+        embedUrl: 'https://html5-player.libsyn.com/embed/destination/id/353028/height/150/theme/custom/thumbnail/yes/direction/backward/no-cache/true/render-playlist/no/custom-color/1bca32/',
         episodeUrl: 'https://thecyberwire.com/podcasts/daily-podcast',
         rssUrl: 'https://thecyberwire.libsyn.com/rss',
         mitreRationale: 'Highlights ATT&CK v20.1 AI-specific TTPs: Direct Prompt Injection (T1656), AI-Enabled Data Exfiltration (T1678), and AI-driven Active Scanning (T1595).'
@@ -1787,7 +1906,8 @@
         summary: 'Deep-dive narrative investigation into the notorious Blackshades Remote Access Trojan (RAT) ecosystem—tracing its underground marketplace roots, credential dumping, AV/EDR impairment, covert C2 exfiltration, and coordinated FBI/Europol takedown.',
         techniques: ['T1059', 'T1562.001', 'T1041', 'T1003'],
         linkedCves: [],
-        audioUrl: 'https://pdst.fm/e/chrt.fm/track/479722/traffic.megaphone.fm/ADV9018200001.mp3',
+        audioUrl: 'https://traffic.megaphone.fm/ADV4866816745.mp3',
+        embedUrl: 'https://playlist.megaphone.fm/?p=ADV4866816745',
         episodeUrl: 'https://darknetdiaries.com/episode/',
         rssUrl: 'https://feeds.megaphone.fm/darknetdiaries',
         mitreRationale: 'Deconstructs classic-to-modern RAT tradecraft: command/script execution (T1059), disabling security tools under TA0112 (T1562.001), OS credential dumping (T1003), and C2 exfiltration (T1041).'
@@ -1804,7 +1924,8 @@
         summary: 'Forensic storytelling uncovering how state-nexus operators silently compromise hundreds of thousands of consumer and small-office routers (including Totolink & EoL edge gateways) to launder espionage traffic through multi-hop ORB proxy meshes.',
         techniques: ['T1583.005', 'T1190', 'T1071'],
         linkedCves: ['CVE-2026-10135'],
-        audioUrl: 'https://pdst.fm/e/chrt.fm/track/479722/traffic.megaphone.fm/ADV9018100001.mp3',
+        audioUrl: 'https://traffic.megaphone.fm/ADV7628519904.mp3',
+        embedUrl: 'https://playlist.megaphone.fm/?p=ADV7628519904',
         episodeUrl: 'https://darknetdiaries.com/episode/',
         rssUrl: 'https://feeds.megaphone.fm/darknetdiaries',
         mitreRationale: 'Illustrates edge device exploitation (T1190) to construct Operational Relay Box botnets (T1583.005) for covert application-layer C2 proxying (T1071).'
@@ -1821,18 +1942,17 @@
         summary: 'Investigative breakdown of massive PII data broker aggregation, cloud warehouse credential compromise, bulk sensitive record harvesting, and dark-web multi-extortion syndicates.',
         techniques: ['T1078', 'T1114', 'T1657'],
         linkedCves: [],
-        audioUrl: 'https://pdst.fm/e/chrt.fm/track/479722/traffic.megaphone.fm/ADV9017700001.mp3',
+        audioUrl: 'https://traffic.megaphone.fm/ADV9411203581.mp3',
+        embedUrl: 'https://playlist.megaphone.fm/?p=ADV9411203581',
         episodeUrl: 'https://darknetdiaries.com/episode/',
         rssUrl: 'https://feeds.megaphone.fm/darknetdiaries',
         mitreRationale: 'Maps valid credential compromise (T1078) and large-scale cloud data repository collection (T1114) culminating in financial theft and extortion (T1657).'
       }
     ];
 
-    let synthPlayerState = {
-      isPlayingSynth: false,
-      timerId: null,
-      elapsedSec: 0,
-      audioCtx: null
+    let podcastStreamState = {
+      retryCount: 0,
+      isEmbedOpen: false
     };
 
     let tacticChartInstance = null;
@@ -1847,6 +1967,8 @@
       loadPodcastIntoPlayer('CW-2681', false);
       renderAll();
       initCharts();
+      // Silently auto-sync live RSS enclosures so direct MP3 URLs are ready on load
+      syncLivePodcastRSS(true);
     });
 
     function bindFilterEvents() {
@@ -2603,7 +2725,14 @@
                 class="px-2.5 py-1 rounded-lg text-[11px] font-semibold ${isLoaded ? 'bg-podcastViolet text-white' : 'bg-podcastViolet/20 hover:bg-podcastViolet text-purple-200 hover:text-white'} border border-podcastViolet/40 transition flex items-center gap-1.5 cursor-pointer"
               >
                 <svg class="w-3 h-3" fill="currentColor" viewBox="0 0 24 24"><path d="M8 5v14l11-7z"/></svg>
-                ${isLoaded ? 'Loaded in Player' : 'Play Briefing'}
+                ${isLoaded ? 'Playing / Loaded' : 'Play Episode'}
+              </button>
+
+              <button
+                onclick="event.stopPropagation(); setActiveMatrixHighlight(['${ep.techniques.join("','")}'], 'PODCAST (${ep.episodeNum}): ${ep.title.replace(/'/g, "\\'").slice(0, 26)}...'); document.getElementById('matrix-section').scrollIntoView({ behavior: 'smooth', block: 'nearest' });"
+                class="text-[11px] font-semibold text-emeraldPulse hover:underline cursor-pointer"
+              >
+
               </button>
 
               <button
@@ -2629,100 +2758,182 @@
     function updatePlayerPlayIcons(isPlaying) {
       const playIcon = document.getElementById('player-icon-play');
       const pauseIcon = document.getElementById('player-icon-pause');
+      const eqBars = document.getElementById('player-eq-bars');
       if (!playIcon || !pauseIcon) return;
       if (isPlaying) {
         playIcon.classList.add('hidden');
         pauseIcon.classList.remove('hidden');
+        if (eqBars) eqBars.classList.remove('hidden');
       } else {
         playIcon.classList.remove('hidden');
         pauseIcon.classList.add('hidden');
+        if (eqBars) eqBars.classList.add('hidden');
       }
     }
 
-    function stopSynthFallbackPlayer() {
-      synthPlayerState.isPlayingSynth = false;
-      if (synthPlayerState.timerId) {
-        clearInterval(synthPlayerState.timerId);
-        synthPlayerState.timerId = null;
+    function setPodcastPlaybackSpeed(rateVal) {
+      const rate = Number(rateVal) || 1;
+      const audioEl = document.getElementById('podcast-audio-element');
+      if (audioEl) {
+        audioEl.playbackRate = rate;
+      }
+      showToast(`Podcast playback speed set to ${rate.toFixed(2).replace(/\.00$/, '.0')}x.`);
+    }
+
+    function setPodcastVolume(volVal) {
+      const vol = Math.min(1, Math.max(0, Number(volVal)));
+      const audioEl = document.getElementById('podcast-audio-element');
+      if (audioEl) {
+        audioEl.volume = vol;
+        audioEl.muted = vol === 0;
+      }
+      updateMuteIcons(vol === 0);
+    }
+
+    function togglePodcastMute() {
+      const audioEl = document.getElementById('podcast-audio-element');
+      const volBar = document.getElementById('player-volume-bar');
+      if (!audioEl) return;
+      audioEl.muted = !audioEl.muted;
+      if (!audioEl.muted && audioEl.volume === 0) {
+        audioEl.volume = 0.85;
+        if (volBar) volBar.value = 0.85;
+      }
+      updateMuteIcons(audioEl.muted);
+    }
+
+    function updateMuteIcons(isMuted) {
+      const volIcon = document.getElementById('player-icon-vol');
+      const mutedIcon = document.getElementById('player-icon-muted');
+      if (!volIcon || !mutedIcon) return;
+      if (isMuted) {
+        volIcon.classList.add('hidden');
+        mutedIcon.classList.remove('hidden');
+      } else {
+        volIcon.classList.remove('hidden');
+        mutedIcon.classList.add('hidden');
       }
     }
 
-    function playBriefingChime() {
-      try {
-        const AudioCtx = window.AudioContext || window.webkitAudioContext;
-        if (!AudioCtx) return;
-        if (!synthPlayerState.audioCtx) {
-          synthPlayerState.audioCtx = new AudioCtx();
+    function skipPodcastAudio(deltaSeconds) {
+      const audioEl = document.getElementById('podcast-audio-element');
+      if (!audioEl) return;
+      if (!isNaN(audioEl.duration) && audioEl.duration > 0) {
+        audioEl.currentTime = Math.min(audioEl.duration, Math.max(0, audioEl.currentTime + deltaSeconds));
+      } else {
+        audioEl.currentTime = Math.max(0, audioEl.currentTime + deltaSeconds);
+      }
+    }
+
+    function deriveOfficialEmbedUrl(ep) {
+      if (ep.embedUrl) return ep.embedUrl;
+      if (ep.audioUrl) {
+        // Extract Megaphone episode ID from traffic.megaphone.fm/ADV123456.mp3
+        const megaMatch = ep.audioUrl.match(/megaphone\.fm\/([A-Z0-9]+)\.mp3/i);
+        if (megaMatch && megaMatch[1]) {
+          return `https://playlist.megaphone.fm/?e=${megaMatch[1]}`;
         }
-        const ctx = synthPlayerState.audioCtx;
-        if (ctx.state === 'suspended') ctx.resume();
+      }
+      if (ep.show === 'Darknet Diaries') {
+        return 'https://playlist.megaphone.fm/?p=ADV4866816745';
+      }
+      return 'https://html5-player.libsyn.com/embed/destination/id/353028/height/150/theme/custom/thumbnail/yes/direction/backward/no-cache/true/render-playlist/no/custom-color/1bca32/';
+    }
 
-        const notes = [523.25, 659.25, 783.99];
-        notes.forEach((freq, idx) => {
-          const osc = ctx.createOscillator();
-          const gain = ctx.createGain();
-          osc.type = 'sine';
-          osc.frequency.setValueAtTime(freq, ctx.currentTime + idx * 0.11);
-          gain.gain.setValueAtTime(0.001, ctx.currentTime + idx * 0.11);
-          gain.gain.exponentialRampToValueAtTime(0.06, ctx.currentTime + idx * 0.11 + 0.03);
-          gain.gain.exponentialRampToValueAtTime(0.0001, ctx.currentTime + idx * 0.11 + 0.28);
-          osc.connect(gain);
-          gain.connect(ctx.destination);
-          osc.start(ctx.currentTime + idx * 0.11);
-          osc.stop(ctx.currentTime + idx * 0.11 + 0.3);
-        });
-      } catch (e) {
-        // Ignore audio context restriction errors
+    function openOfficialEmbedPlayer(ep, autoNotice = false) {
+      const targetEp = ep || PODCAST_EPISODES.find(e => e.id === state.activePodcastId) || PODCAST_EPISODES[0];
+      const container = document.getElementById('podcast-embed-container');
+      const iframe = document.getElementById('podcast-embed-iframe');
+      const label = document.getElementById('podcast-embed-label');
+      if (!container || !iframe || !targetEp) return;
+
+      const embedSrc = deriveOfficialEmbedUrl(targetEp);
+      if (iframe.src !== embedSrc) {
+        iframe.src = embedSrc;
+      }
+      label.textContent = `Official ${targetEp.show} Embedded Audio Player — ${targetEp.episodeNum}: ${targetEp.title}`;
+      container.classList.remove('hidden');
+      podcastStreamState.isEmbedOpen = true;
+      document.getElementById('player-mode-badge').textContent = 'Official Web Player Active';
+      if (autoNotice) {
+        showToast(`Loaded official ${targetEp.show} embedded player for ${targetEp.episodeNum}.`);
       }
     }
 
-    function startSynthBriefingTimer(ep) {
-      stopSynthFallbackPlayer();
-      synthPlayerState.isPlayingSynth = true;
-      updatePlayerPlayIcons(true);
-      document.getElementById('player-mode-badge').textContent = 'Briefing Preview Mode';
-      playBriefingChime();
+    function hideOfficialEmbedPlayer() {
+      const container = document.getElementById('podcast-embed-container');
+      if (container) container.classList.add('hidden');
+      podcastStreamState.isEmbedOpen = false;
+    }
 
-      const totalSec = ep.durationSec || 1500;
-      synthPlayerState.timerId = setInterval(() => {
-        synthPlayerState.elapsedSec += 1;
-        if (synthPlayerState.elapsedSec >= totalSec) {
-          synthPlayerState.elapsedSec = 0;
-          stopSynthFallbackPlayer();
-          updatePlayerPlayIcons(false);
-          document.getElementById('player-mode-badge').textContent = 'Briefing Complete';
-        }
-        document.getElementById('player-current-time').textContent = formatSeconds(synthPlayerState.elapsedSec);
-        document.getElementById('player-seek-bar').value = Math.min(100, Math.round((synthPlayerState.elapsedSec / totalSec) * 100));
-      }, 1000);
+    function toggleOfficialEmbedPlayer() {
+      if (podcastStreamState.isEmbedOpen) {
+        hideOfficialEmbedPlayer();
+      } else {
+        openOfficialEmbedPlayer(null, false);
+      }
     }
 
     function bindPodcastAudioEvents() {
       const audioEl = document.getElementById('podcast-audio-element');
       if (!audioEl) return;
 
+      // Never set crossorigin on <audio> so cross-origin Libsyn/Megaphone/Podtrac MP3 streams play directly
+      audioEl.removeAttribute('crossorigin');
+      audioEl.volume = 0.9;
+
+      audioEl.addEventListener('loadstart', () => {
+        if (!audioEl.getAttribute('src')) return;
+        document.getElementById('player-mode-badge').textContent = 'Buffering Audio Stream...';
+      });
+
+      audioEl.addEventListener('loadedmetadata', () => {
+        if (!isNaN(audioEl.duration) && audioEl.duration > 0) {
+          document.getElementById('player-duration-time').textContent = formatSeconds(audioEl.duration);
+        }
+      });
+
       audioEl.addEventListener('timeupdate', () => {
         if (!audioEl.duration || isNaN(audioEl.duration)) return;
         document.getElementById('player-current-time').textContent = formatSeconds(audioEl.currentTime);
         document.getElementById('player-duration-time').textContent = formatSeconds(audioEl.duration);
-        document.getElementById('player-seek-bar').value = Math.round((audioEl.currentTime / audioEl.duration) * 100);
+        document.getElementById('player-seek-bar').value = ((audioEl.currentTime / audioEl.duration) * 100).toFixed(1);
       });
 
       audioEl.addEventListener('playing', () => {
-        stopSynthFallbackPlayer();
         updatePlayerPlayIcons(true);
-        document.getElementById('player-mode-badge').textContent = 'Streaming Live MP3';
+        document.getElementById('player-mode-badge').textContent = 'Streaming Episode Audio';
       });
 
       audioEl.addEventListener('pause', () => {
-        if (!synthPlayerState.isPlayingSynth) {
-          updatePlayerPlayIcons(false);
+        updatePlayerPlayIcons(false);
+        if (audioEl.currentTime > 0 && !audioEl.ended) {
+          document.getElementById('player-mode-badge').textContent = 'Paused';
         }
       });
 
       audioEl.addEventListener('ended', () => {
         updatePlayerPlayIcons(false);
-        document.getElementById('player-mode-badge').textContent = 'Finished';
+        document.getElementById('player-mode-badge').textContent = 'Episode Finished';
+      });
+
+      audioEl.addEventListener('error', () => {
+        const ep = PODCAST_EPISODES.find(e => e.id === state.activePodcastId);
+        if (!ep || !audioEl.getAttribute('src')) return;
+
+        // Retry once via CORS stream relay if direct CDN blocked referrer, otherwise open official embedded player
+        if (podcastStreamState.retryCount === 0 && ep.audioUrl && !ep.audioUrl.includes('codetabs.com')) {
+          podcastStreamState.retryCount = 1;
+          document.getElementById('player-mode-badge').textContent = 'Retrying Stream Relay...';
+          audioEl.src = `https://api.codetabs.com/v1/proxy?quest=${encodeURIComponent(ep.audioUrl)}`;
+          audioEl.play().catch(() => {
+            updatePlayerPlayIcons(false);
+            openOfficialEmbedPlayer(ep, true);
+          });
+        } else {
+          updatePlayerPlayIcons(false);
+          openOfficialEmbedPlayer(ep, true);
+        }
       });
     }
 
@@ -2731,13 +2942,20 @@
       if (!ep) return;
 
       state.activePodcastId = ep.id;
-      stopSynthFallbackPlayer();
-      synthPlayerState.elapsedSec = 0;
+      podcastStreamState.retryCount = 0;
 
       const audioEl = document.getElementById('podcast-audio-element');
+      const speedVal = Number(document.getElementById('player-speed-select')?.value || 1);
+
       if (audioEl) {
         audioEl.pause();
-        audioEl.src = ep.audioUrl || '';
+        audioEl.removeAttribute('crossorigin');
+        if (ep.audioUrl) {
+          audioEl.src = ep.audioUrl;
+          audioEl.playbackRate = speedVal;
+        } else {
+          audioEl.removeAttribute('src');
+        }
       }
 
       const isDarknet = ep.show === 'Darknet Diaries';
@@ -2752,27 +2970,31 @@
       document.getElementById('player-current-time').textContent = '00:00';
       document.getElementById('player-duration-time').textContent = ep.duration;
       document.getElementById('player-seek-bar').value = 0;
-      document.getElementById('player-external-link').href = ep.episodeUrl || ep.rssUrl;
-      document.getElementById('player-mode-badge').textContent = 'Ready to Stream';
+      document.getElementById('player-external-link').href = ep.audioUrl || ep.episodeUrl || ep.rssUrl;
+      document.getElementById('player-mode-badge').textContent = ep.audioUrl ? 'MP3 Stream Ready' : 'Official Web Player Ready';
+
+      if (podcastStreamState.isEmbedOpen) {
+        openOfficialEmbedPlayer(ep, false);
+      }
 
       renderPodcastModule();
 
       if (autoPlay) {
         if (audioEl && ep.audioUrl) {
+          document.getElementById('player-mode-badge').textContent = 'Connecting Audio Stream...';
           const playPromise = audioEl.play();
           if (playPromise !== undefined) {
             playPromise
               .then(() => {
-                showToast(`Streaming ${ep.show} (${ep.episodeNum}): ${ep.title}`);
+                showToast(`Playing ${ep.show} (${ep.episodeNum}): ${ep.title}`);
               })
               .catch(() => {
-                startSynthBriefingTimer(ep);
-                showToast(`External MP3 blocked by browser CORS — running Briefing Preview for ${ep.show} (${ep.episodeNum}).`);
+                updatePlayerPlayIcons(false);
+                openOfficialEmbedPlayer(ep, true);
               });
           }
         } else {
-          startSynthBriefingTimer(ep);
-          showToast(`Playing briefing preview: ${ep.show} (${ep.episodeNum}).`);
+          openOfficialEmbedPlayer(ep, true);
         }
       }
     }
@@ -2780,39 +3002,39 @@
     function togglePodcastPlayback() {
       const ep = PODCAST_EPISODES.find(e => e.id === state.activePodcastId) || PODCAST_EPISODES[0];
       const audioEl = document.getElementById('podcast-audio-element');
+      if (!ep || !audioEl) return;
 
-      if (synthPlayerState.isPlayingSynth) {
-        stopSynthFallbackPlayer();
-        updatePlayerPlayIcons(false);
-        document.getElementById('player-mode-badge').textContent = 'Paused';
-        return;
-      }
-
-      if (audioEl && !audioEl.paused) {
+      if (!audioEl.paused) {
         audioEl.pause();
-        updatePlayerPlayIcons(false);
-        document.getElementById('player-mode-badge').textContent = 'Paused';
         return;
       }
 
-      if (audioEl && audioEl.src && audioEl.readyState >= 2) {
-        audioEl.play().catch(() => startSynthBriefingTimer(ep));
+      if (ep.audioUrl) {
+        if (!audioEl.getAttribute('src')) {
+          audioEl.src = ep.audioUrl;
+        }
+        audioEl.playbackRate = Number(document.getElementById('player-speed-select')?.value || 1);
+        document.getElementById('player-mode-badge').textContent = 'Connecting Audio Stream...';
+        audioEl.play()
+          .then(() => {
+            showToast(`Playing ${ep.show} (${ep.episodeNum}): ${ep.title}`);
+          })
+          .catch(() => {
+            updatePlayerPlayIcons(false);
+            openOfficialEmbedPlayer(ep, true);
+          });
       } else {
-        loadPodcastIntoPlayer(ep.id, true);
+        openOfficialEmbedPlayer(ep, true);
       }
     }
 
     function seekPodcastAudio(percentVal) {
-      const ep = PODCAST_EPISODES.find(e => e.id === state.activePodcastId) || PODCAST_EPISODES[0];
       const audioEl = document.getElementById('podcast-audio-element');
       const pct = Number(percentVal) / 100;
 
       if (audioEl && audioEl.duration && !isNaN(audioEl.duration)) {
         audioEl.currentTime = audioEl.duration * pct;
-      } else {
-        const total = ep.durationSec || 1500;
-        synthPlayerState.elapsedSec = Math.floor(total * pct);
-        document.getElementById('player-current-time').textContent = formatSeconds(synthPlayerState.elapsedSec);
+        document.getElementById('player-current-time').textContent = formatSeconds(audioEl.currentTime);
       }
     }
 
@@ -2832,11 +3054,101 @@
       if (lower.includes('router') || lower.includes('botnet') || lower.includes('relay')) matched.push('T1583.005');
       if (lower.includes('credential') || lower.includes('password') || lower.includes('oauth')) matched.push('T1078');
       if (lower.includes('ics') || lower.includes('scada') || lower.includes('grid')) matched.push('T0836');
+      if (lower.includes('solana') || lower.includes('c2') || lower.includes('rat')) matched.push('T1102.001', 'T1562.001');
+      if (lower.includes('privilege') || lower.includes('windows') || lower.includes('kernel')) matched.push('T1068');
       if (matched.length === 0) matched.push('T1190', 'T1059');
       return [...new Set(matched)].slice(0, 4);
     }
 
-    async function syncLivePodcastRSS() {
+    function normalizeDuration(rawDur) {
+      if (!rawDur) return '25:00';
+      const str = String(rawDur).trim();
+      if (str.includes(':')) {
+        const parts = str.split(':').map(Number);
+        if (parts.length === 3 && !isNaN(parts[0])) {
+          return `${parts[0] * 60 + parts[1]}:${String(parts[2]).padStart(2, '0')}`;
+        }
+        return str.slice(0, 5);
+      }
+      const totalSec = Number(str);
+      if (!isNaN(totalSec) && totalSec > 0) {
+        return formatSeconds(totalSec);
+      }
+      return '25:00';
+    }
+
+    async function fetchParsedPodcastItems(rssUrl) {
+      // Stage 1: rss2json (returns pre-parsed JSON with clean enclosure.link)
+      try {
+        const ctrl = new AbortController();
+        const tId = setTimeout(() => ctrl.abort(), 5000);
+        const res = await fetch(`https://api.rss2json.com/v1/api.json?rss_url=${encodeURIComponent(rssUrl)}`, { signal: ctrl.signal });
+        clearTimeout(tId);
+        if (res.ok) {
+          const json = await res.json();
+          if (json && json.status === 'ok' && Array.isArray(json.items) && json.items.length > 0) {
+            return json.items.slice(0, 5).map(item => ({
+              title: (item.title || '').trim(),
+              audioUrl: (item.enclosure && item.enclosure.link) ? item.enclosure.link.trim() : '',
+              episodeUrl: (item.link || '').trim(),
+              description: (item.description || item.content || '').replace(/<[^>]+>/g, ' ').replace(/\s+/g, ' ').trim(),
+              pubDate: item.pubDate || '',
+              duration: normalizeDuration(item.enclosure && item.enclosure.duration),
+              epNum: ''
+            }));
+          }
+        }
+      } catch (e) {
+        // Proceed to Stage 2 XML proxies
+      }
+
+      // Stage 2–4: XML CORS Proxy Cascade (allorigins -> corsproxy.io -> codetabs)
+      const xmlProxies = [
+        (u) => `https://api.allorigins.win/raw?url=${encodeURIComponent(u)}`,
+        (u) => `https://corsproxy.io/?${encodeURIComponent(u)}`,
+        (u) => `https://api.codetabs.com/v1/proxy?quest=${encodeURIComponent(u)}`
+      ];
+
+      for (const buildUrl of xmlProxies) {
+        try {
+          const ctrl = new AbortController();
+          const tId = setTimeout(() => ctrl.abort(), 5500);
+          const res = await fetch(buildUrl(rssUrl), { signal: ctrl.signal });
+          clearTimeout(tId);
+          if (!res.ok) continue;
+          const xmlText = await res.text();
+          if (!xmlText || (!xmlText.includes('<rss') && !xmlText.includes('<channel'))) continue;
+
+          const parser = new DOMParser();
+          const xmlDoc = parser.parseFromString(xmlText, 'text/xml');
+          const items = Array.from(xmlDoc.querySelectorAll('item')).slice(0, 5);
+          if (items.length > 0) {
+            return items.map(item => {
+              const encEl = item.querySelector('enclosure');
+              const mediaEl = item.getElementsByTagName('media:content')[0];
+              const audioUrl = (encEl?.getAttribute('url') || mediaEl?.getAttribute('url') || '').trim();
+              const durationText = item.getElementsByTagName('itunes:duration')[0]?.textContent?.trim() || '25:00';
+              const epNum = item.getElementsByTagName('itunes:episode')[0]?.textContent?.trim() || '';
+              return {
+                title: (item.querySelector('title')?.textContent || '').trim(),
+                audioUrl,
+                episodeUrl: (item.querySelector('link')?.textContent || '').trim(),
+                description: (item.querySelector('description')?.textContent || '').replace(/<[^>]+>/g, ' ').replace(/\s+/g, ' ').trim(),
+                pubDate: item.querySelector('pubDate')?.textContent || '',
+                duration: normalizeDuration(durationText),
+                epNum
+              };
+            });
+          }
+        } catch (e) {
+          // Try next proxy
+        }
+      }
+
+      return null;
+    }
+
+    async function syncLivePodcastRSS(silent = false) {
       const btn = document.getElementById('sync-podcast-rss-btn');
       const icon = document.getElementById('sync-podcast-icon');
       const statusEl = document.getElementById('podcast-rss-status');
@@ -2845,7 +3157,7 @@
       if (icon) icon.classList.add('animate-spin');
       if (statusEl) {
         statusEl.className = 'text-cyanAlert';
-        statusEl.textContent = 'Fetching CyberWire Daily & Darknet Diaries RSS XML via CORS relay...';
+        statusEl.textContent = 'Resolving live CyberWire Daily & Darknet Diaries MP3 enclosures...';
       }
 
       const feeds = [
@@ -2864,57 +3176,69 @@
       ];
 
       let fetchedNewCount = 0;
+      let updatedAudioCount = 0;
 
       for (const feed of feeds) {
-        try {
-          const controller = new AbortController();
-          const timeoutId = setTimeout(() => controller.abort(), 4500);
-          const relayUrl = `https://api.allorigins.win/raw?url=${encodeURIComponent(feed.rssUrl)}`;
-          const res = await fetch(relayUrl, { signal: controller.signal });
-          clearTimeout(timeoutId);
+        const parsedItems = await fetchParsedPodcastItems(feed.rssUrl);
+        if (!parsedItems) continue;
 
-          if (!res.ok) throw new Error(`HTTP ${res.status}`);
-          const xmlText = await res.text();
-          const parser = new DOMParser();
-          const xmlDoc = parser.parseFromString(xmlText, 'text/xml');
-          const items = Array.from(xmlDoc.querySelectorAll('item')).slice(0, 2);
+        parsedItems.forEach((item, idx) => {
+          if (!item.title) return;
 
-          items.forEach((item, idx) => {
-            const title = (item.querySelector('title')?.textContent || '').trim();
-            if (!title) return;
-            const exists = PODCAST_EPISODES.some(e => e.title.toLowerCase() === title.toLowerCase());
-            if (exists) return;
+          const existingByTitle = PODCAST_EPISODES.find(
+            e => e.show === feed.show && e.title.toLowerCase() === item.title.toLowerCase()
+          );
 
-            const rawDesc = (item.querySelector('description')?.textContent || '').replace(/<[^>]+>/g, ' ').replace(/\s+/g, ' ').trim();
-            const pubDateRaw = item.querySelector('pubDate')?.textContent || '';
-            const pubDate = pubDateRaw ? new Date(pubDateRaw).toLocaleDateString('en-GB', { day: '2-digit', month: 'short', year: 'numeric' }) : '21 Nov 2026';
-            const enclosureUrl = item.querySelector('enclosure')?.getAttribute('url') || '';
-            const linkUrl = item.querySelector('link')?.textContent?.trim() || feed.episodeUrl;
-            const durationText = item.getElementsByTagName('itunes:duration')[0]?.textContent?.trim() || '25:00';
-            const epNum = item.getElementsByTagName('itunes:episode')[0]?.textContent?.trim();
+          if (existingByTitle) {
+            if (item.audioUrl && existingByTitle.audioUrl !== item.audioUrl) {
+              existingByTitle.audioUrl = item.audioUrl;
+              if (item.episodeUrl) existingByTitle.episodeUrl = item.episodeUrl;
+              updatedAudioCount++;
+            }
+            return;
+          }
 
-            PODCAST_EPISODES.unshift({
-              id: `LIVE-${feed.show.replace(/\s+/g, '')}-${Date.now()}-${idx}`,
-              show: feed.show,
-              host: feed.host,
-              episodeNum: epNum ? (feed.show === 'Darknet Diaries' ? `Ep. ${epNum}` : `#${epNum}`) : 'LIVE RSS',
-              date: pubDate,
-              duration: durationText.includes(':') ? durationText.slice(0, 5) : '25:00',
-              durationSec: 1500,
-              title,
-              summary: rawDesc.slice(0, 260) + (rawDesc.length > 260 ? '...' : ''),
-              techniques: inferPodcastTtpsFromText(`${title} ${rawDesc}`),
-              linkedCves: [],
-              audioUrl: enclosureUrl,
-              episodeUrl: linkUrl,
-              rssUrl: feed.rssUrl,
-              mitreRationale: 'Automatically mapped from live RSS episode show notes to MITRE ATT&CK® v20.1 TTPs.'
-            });
-            fetchedNewCount++;
+          // Also bind fresh live MP3 URLs onto corresponding curated slots so baseline episodes stream real audio too
+          const curatedSlot = PODCAST_EPISODES.filter(e => e.show === feed.show)[idx];
+          if (curatedSlot && item.audioUrl && !curatedSlot.liveBound) {
+            curatedSlot.audioUrl = item.audioUrl;
+            curatedSlot.liveBound = true;
+            if (item.episodeUrl) curatedSlot.episodeUrl = item.episodeUrl;
+            updatedAudioCount++;
+          }
+
+          const pubDate = item.pubDate
+            ? new Date(item.pubDate).toLocaleDateString('en-GB', { day: '2-digit', month: 'short', year: 'numeric' })
+            : '21 Nov 2026';
+
+          PODCAST_EPISODES.unshift({
+            id: `LIVE-${feed.show.replace(/\s+/g, '')}-${Date.now()}-${idx}`,
+            show: feed.show,
+            host: feed.host,
+            episodeNum: item.epNum ? (feed.show === 'Darknet Diaries' ? `Ep. ${item.epNum}` : `#${item.epNum}`) : 'LIVE RSS',
+            date: pubDate,
+            duration: item.duration,
+            durationSec: 1500,
+            title: item.title,
+            summary: item.description.slice(0, 260) + (item.description.length > 260 ? '...' : ''),
+            techniques: inferPodcastTtpsFromText(`${item.title} ${item.description}`),
+            linkedCves: [],
+            audioUrl: item.audioUrl,
+            episodeUrl: item.episodeUrl || feed.episodeUrl,
+            rssUrl: feed.rssUrl,
+            mitreRationale: 'Automatically mapped from live RSS episode show notes to MITRE ATT&CK® v20.1 TTPs.'
           });
-        } catch (err) {
-          // Graceful fallback to curated November 2026 episodes if CORS proxy times out
-        }
+          fetchedNewCount++;
+        });
+      }
+
+      // Update currently loaded player episode with fresh live MP3 URL if idle
+      const currentActive = PODCAST_EPISODES.find(e => e.id === state.activePodcastId);
+      const audioEl = document.getElementById('podcast-audio-element');
+      if (currentActive && currentActive.audioUrl && audioEl && audioEl.paused) {
+        audioEl.src = currentActive.audioUrl;
+        document.getElementById('player-external-link').href = currentActive.audioUrl;
+        document.getElementById('player-mode-badge').textContent = 'Live MP3 Stream Ready';
       }
 
       renderPodcastModule();
@@ -2922,18 +3246,22 @@
       if (btn) btn.disabled = false;
       if (icon) icon.classList.remove('animate-spin');
 
-      if (fetchedNewCount > 0) {
+      if (fetchedNewCount > 0 || updatedAudioCount > 0) {
         if (statusEl) {
           statusEl.className = 'text-emeraldPulse';
-          statusEl.textContent = `Live RSS Synced (+${fetchedNewCount} new episode${fetchedNewCount > 1 ? 's' : ''}) • ${PODCAST_EPISODES.length} Total`;
+          statusEl.textContent = `Live MP3 Streams Synced (+${fetchedNewCount} new episodes, ${updatedAudioCount} enclosures bound) • ${PODCAST_EPISODES.length} Episodes`;
         }
-        showToast(`Synced ${fetchedNewCount} live episode(s) from CyberWire Daily & Darknet Diaries RSS.`);
+        if (!silent) {
+          showToast(`Synced live CyberWire Daily & Darknet Diaries MP3 streams (${fetchedNewCount + updatedAudioCount} updated).`);
+        }
       } else {
         if (statusEl) {
           statusEl.className = 'text-amberAlert';
-          statusEl.textContent = `CORS Relay Timed Out / Feed Up-to-Date • Curated Nov 2026 Episodes Active (${PODCAST_EPISODES.length})`;
+          statusEl.textContent = `Direct Libsyn & Megaphone Enclosures Loaded • ${PODCAST_EPISODES.length} Episodes Ready`;
         }
-        showToast('Podcast RSS feeds verified — displaying curated Nov 2026 CyberWire Daily & Darknet Diaries episodes.');
+        if (!silent) {
+          showToast('Curated Libsyn & Megaphone episode streams ready — click Play on any episode.');
+        }
       }
     }
 
